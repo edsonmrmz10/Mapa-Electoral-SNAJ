@@ -1,0 +1,733 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mapa Electoral México 2018–2024</title>
+<meta name="description" content="Análisis de las elecciones federales en México 2018, 2021 y 2024: presidencia, diputaciones y senadurías por estado.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#040a1f; --panel:#08112c; --panel2:#0d1938; --line:#15224a; --line2:#26386d;
+  --tx:#f1f6ff; --tx2:#a5c4f2; --tx3:#62779f; --glow:#4f9cf0;
+  --c1:#e5484d; --c2:#3b6cf0; --c3:#3da66a; --mc:#f7931e;
+  --serif:'Montserrat',-apple-system,'Segoe UI',sans-serif;
+  --sans:'Montserrat',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --pad:clamp(16px,2.2vw,28px);
+}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth;background:var(--bg)}
+body{background-color:var(--bg);background-image:radial-gradient(80% 460px at 50% -120px,rgba(38,92,205,.30),transparent 72%);background-repeat:no-repeat;color:var(--tx);font:14px/1.45 var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+img{max-width:100%;display:block}
+.serif{font-family:var(--serif);font-weight:400;letter-spacing:-.01em}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--tx2)} .dim{color:var(--tx3)}
+
+/* top bar */
+.topbar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:14px;padding:12px var(--pad);background:rgba(4,10,31,.82);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);flex-wrap:wrap}
+.brand{font-family:var(--serif);font-size:22px;white-space:nowrap}
+.brand small{font:12px var(--sans);color:var(--tx3);margin-left:6px}
+.pills{display:flex;gap:2px;padding:4px;border:1px solid var(--line);border-radius:999px;background:var(--panel)}
+.pill{padding:7px 16px;border-radius:999px;color:var(--tx2);transition:.15s;white-space:nowrap}
+.pill:hover{color:var(--tx)} .pill.on{background:var(--line2);color:var(--tx)}
+.pills.sm .pill{padding:5px 12px;font-size:13px}
+.search{display:flex;align-items:center;gap:10px;padding:8px 14px;border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--tx2);min-width:170px}
+.search kbd{font:11px var(--sans);padding:2px 6px;border-radius:5px;background:var(--line);color:var(--tx3);margin-left:auto}
+.spacer{flex:1}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid var(--line);border-radius:999px;background:var(--panel);color:var(--tx);font-size:13px}
+.btn:hover{border-color:var(--line2)}
+.nav a{color:var(--tx2);text-decoration:none;margin-right:14px;font-size:13px}.nav a:hover{color:var(--tx)}
+
+/* hero */
+.hero{position:relative;padding:clamp(48px,9vw,110px) var(--pad) clamp(36px,6vw,70px);max-width:1500px;margin:auto}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--tx3);display:flex;align-items:center;gap:10px}
+.eyebrow i{width:8px;height:8px;border-radius:50%;background:var(--glow);box-shadow:0 0 0 4px rgba(79,156,240,.2)}
+.hero h1{font-family:var(--serif);font-weight:400;font-size:clamp(38px,6.4vw,92px);line-height:1.02;letter-spacing:-.025em;margin:22px 0 22px;max-width:15em}
+.hero h1 em{font-style:normal;background:linear-gradient(100deg,#4f9cf0 0%,#9cc6fb 55%,#f1f6ff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;padding-right:.06em} .hero h1 em.b{color:var(--c2)} .hero h1 em.o{color:var(--mc)}
+.hero p.lead{font-size:clamp(15px,1.4vw,18px);color:var(--tx2);max-width:44em}
+.hero-cta{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap}
+.btn.primary{background:linear-gradient(100deg,#4f9cf0,#cfe3ff);color:#04112e;border-color:transparent;font-weight:700}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:18px;overflow:hidden;margin-top:clamp(36px,6vw,70px)}
+.kpi{background:var(--panel);padding:22px 22px 20px}
+.kpi b{display:block;font-family:var(--serif);font-weight:400;font-size:clamp(36px,4vw,54px);line-height:1;letter-spacing:-.02em}
+.kpi b sup{font-size:.4em;color:var(--tx3);vertical-align:top;margin-left:2px}
+.kpi span{display:block;margin-top:10px;color:var(--tx2);font-size:13px}
+.strip{display:flex;height:6px;border-radius:3px;overflow:hidden;margin-top:14px;gap:2px}
+
+/* dashboard */
+.dash{display:grid;grid-template-columns:minmax(300px,360px) minmax(0,1fr) minmax(290px,350px);gap:14px;padding:0 var(--pad);max-width:1700px;margin:auto}
+.dash.full{background:var(--bg);padding:14px;max-width:none;height:100vh;overflow:auto}
+.col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:18px}
+.card h3{font:700 14px var(--sans);letter-spacing:-.01em;display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:14px}
+.card h3 span{font-weight:400;font-size:12px;color:var(--tx3)}
+.ctx{display:flex;align-items:center;gap:10px;color:var(--tx2);font-size:12.5px;margin-bottom:14px;flex-wrap:wrap}
+.tag{padding:4px 10px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);color:var(--tx);font-size:12px}
+.headline{font-family:var(--serif);font-size:clamp(26px,2.3vw,34px);line-height:1.08;letter-spacing:-.015em;margin-bottom:18px}
+.duel{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
+.side{display:flex;flex-direction:column;gap:12px}
+.side.r{text-align:right;align-items:flex-end}
+.who{display:flex;align-items:center;gap:10px}
+.side.r .who{flex-direction:row-reverse}
+.who b{font-weight:500;display:block;line-height:1.15}
+.who small{font-size:12px}
+.face{width:46px;height:46px;border-radius:12px;object-fit:cover;object-position:top;flex:none;background:var(--panel2)}
+.logos{display:flex;flex:none}
+.logos span{width:34px;height:34px;border-radius:50%;background:#fff;border:2px solid var(--panel);margin-left:-9px;display:grid;place-items:center;overflow:hidden}
+.logos span:first-child{margin-left:0}
+.logos img{width:76%;height:76%;object-fit:contain}
+.big{font-family:var(--serif);font-size:clamp(40px,3.6vw,52px);line-height:1;letter-spacing:-.02em}
+.big sup{font-size:.38em;vertical-align:top;margin-left:2px;opacity:.7}
+.vs{font-size:12px;color:var(--tx3)}
+.tug{position:relative;display:flex;height:6px;gap:2px;margin:10px 0 16px}
+.tug i{display:block;height:100%;border-radius:3px;transition:width .5s}
+.rows{display:flex;flex-direction:column}
+.row{display:flex;align-items:center;gap:10px;padding:9px 0;border-top:1px solid var(--line)}
+.row:first-child{border-top:0}
+.row .t{flex:1;min-width:0}.row .t b{font-weight:500;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.row .t small{color:var(--tx3);font-size:12px}
+.row .v{font-variant-numeric:tabular-nums;color:var(--tx);text-align:right}
+.row .v small{display:block;color:var(--tx3);font-size:11.5px}
+.row .face,.row .logos span{width:34px;height:34px}.row .face{border-radius:50%}
+.dl{display:flex;justify-content:space-between;color:var(--tx2);font-size:13px;padding:5px 0}
+.dl b{color:var(--tx);font-weight:500}
+.stats3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+.stats3 small{color:var(--tx3);font-size:11.5px;display:block}
+.stats3 b{font-size:clamp(15px,1.4vw,18px);font-weight:500}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);font-size:12px}
+.chip i{width:8px;height:8px;border-radius:2px;display:block}
+
+/* map */
+.mapcard{padding:0;overflow:hidden;position:relative;display:flex;flex-direction:column;min-height:640px;flex:1;background:radial-gradient(120% 90% at 50% 0%,#0c1a45 0%,var(--bg) 72%)}
+.maphead{display:flex;align-items:center;gap:14px;padding:14px 18px;flex-wrap:wrap}
+.legend{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:12.5px;color:var(--tx2);flex-wrap:wrap}
+.legend b{color:var(--tx);font-weight:500}
+.legend .dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:6px}
+.scale{display:flex;gap:2px;align-items:center}.scale i{width:16px;height:7px;border-radius:2px;display:block}
+.dd{position:relative}
+.ddmenu{position:absolute;top:calc(100% + 8px);left:0;z-index:20;width:300px;max-height:380px;overflow:auto;background:var(--panel2);border:1px solid var(--line2);border-radius:14px;padding:6px;box-shadow:0 20px 50px rgba(0,0,0,.5)}
+.ddmenu button{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border-radius:9px;text-align:left}
+.ddmenu button:hover,.ddmenu button.on{background:var(--line)}
+.ddmenu .pc{margin-left:auto;color:var(--tx2)}
+.mapwrap{position:relative;flex:1;display:grid;place-items:center;padding:0 10px}
+svg.map{width:100%;height:auto;max-height:640px;display:block}
+.st{stroke:#040a1f;stroke-width:1.1;stroke-linejoin:round;cursor:pointer;transition:fill .45s ease,opacity .2s}
+.st:hover{stroke:#fff;stroke-width:1.6}
+.st.sel{stroke:#fff;stroke-width:2}
+.map.hasSel .st:not(.sel){opacity:.55}
+.lbl{font:600 11.5px var(--sans);fill:#fff;text-anchor:middle;pointer-events:none;paint-order:stroke;stroke:rgba(0,0,0,.35);stroke-width:2.2px}
+.lbl.p{font-weight:500;font-size:10px;opacity:.85}
+.pillbox rect{rx:5;transition:fill .45s}.pillbox text{font:600 11px var(--sans);fill:#fff}
+.pillbox{cursor:pointer}
+.callout{stroke:var(--line2);stroke-width:1;fill:none}
+.tip{position:fixed;z-index:60;pointer-events:none;background:var(--panel2);border:1px solid var(--line2);border-radius:12px;padding:10px 12px;font-size:12.5px;min-width:190px;box-shadow:0 12px 40px rgba(0,0,0,.5);opacity:0;transition:opacity .1s}
+.tip b{display:block;font-weight:500;margin-bottom:6px;font-size:13px}
+.tip div{display:flex;justify-content:space-between;gap:16px;color:var(--tx2)}
+.tip div i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px}
+.tip div span:last-child{color:var(--tx);font-variant-numeric:tabular-nums}
+.timeline{display:flex;align-items:center;gap:16px;margin:0 14px 14px;padding:12px 18px;border:1px solid var(--line);border-radius:14px;background:rgba(8,17,44,.8)}
+.play{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#4f9cf0,#cfe3ff);color:#04112e;display:grid;place-items:center;flex:none}
+.track{position:relative;flex:1;height:28px}
+.track:before{content:'';position:absolute;left:0;right:0;top:12px;height:4px;border-radius:2px;background:var(--line2)}
+.track .fill{position:absolute;left:0;top:12px;height:4px;border-radius:2px;background:var(--tx);transition:width .4s}
+.tick{position:absolute;top:0;transform:translateX(-50%);text-align:center;font-size:11.5px;color:var(--tx3)}
+.tick i{display:block;width:14px;height:14px;border-radius:50%;background:var(--bg);border:2px solid var(--line2);margin:5px auto 4px;transition:.2s}
+.tick.on i,.tick.past i{border-color:var(--tx);background:var(--tx)}
+.tick.on{color:var(--tx)}
+.tick{top:-2px;cursor:pointer;padding:0 8px}
+.track{height:46px}.track:before,.track .fill{top:17px}
+.zoom{position:absolute;left:18px;bottom:96px;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--panel)}
+.zoom button{width:36px;height:36px;font-size:18px;color:var(--tx2)}.zoom button:hover{background:var(--line)}
+
+/* right */
+.region{display:grid;grid-template-columns:1fr auto;gap:2px 10px;padding:10px 0;border-top:1px solid var(--line);align-items:center}
+.region:first-of-type{border-top:0}
+.region .nm{font-weight:500}
+.region .ld{display:flex;align-items:center;gap:8px;justify-content:flex-end;font-variant-numeric:tabular-nums}
+.region .ld i{width:8px;height:8px;border-radius:2px}
+.region .ld small{color:var(--tx3)}
+.region .bar{grid-column:1/-1;height:3px;border-radius:2px;background:var(--line);position:relative;margin-top:6px}
+.region .bar b{position:absolute;top:0;height:100%;border-radius:2px}
+.region .bar u{position:absolute;left:50%;top:-3px;width:1px;height:9px;background:var(--tx3)}
+.feed .it{display:grid;grid-template-columns:34px 1fr;gap:12px;padding:12px 0;border-top:1px solid var(--line);font-size:13px}
+.feed .it:first-child{border-top:0}
+.feed .it time{color:var(--tx3);font-size:12px;font-variant-numeric:tabular-nums;padding-top:2px}
+.feed .it em{font-style:normal;font-weight:500}
+.sdetail .top{display:flex;align-items:flex-start;gap:12px;margin-bottom:6px}
+.sdetail .top .ab{width:46px;height:46px;border-radius:12px;display:grid;place-items:center;font-weight:600;font-size:12px;background:var(--panel2);border:1px solid var(--line)}
+.sdetail h2{font-family:var(--serif);font-weight:400;font-size:28px;line-height:1.05}
+.sdetail .x{margin-left:auto;color:var(--tx2);width:30px;height:30px;border-radius:8px}.sdetail .x:hover{background:var(--line)}
+.delta{font-size:12px;font-variant-numeric:tabular-nums}.delta.up{color:#5fd08a}.delta.dn{color:#f06a6a}
+
+/* sections */
+section.blk{max-width:1700px;margin:0 auto;padding:clamp(56px,8vw,110px) var(--pad) 0}
+section.blk h2{font-family:var(--serif);font-weight:400;font-size:clamp(30px,3.6vw,52px);line-height:1.05;letter-spacing:-.02em;max-width:18em}
+section.blk .sub{color:var(--tx2);max-width:46em;margin:14px 0 28px;font-size:15px}
+.two{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:14px}
+.legendrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.tg{display:inline-flex;align-items:center;gap:8px;padding:5px 12px 5px 6px;border-radius:999px;border:1px solid var(--line);background:var(--panel2);font-size:13px;color:var(--tx2);transition:.15s}
+.tg.on{color:var(--tx);border-color:var(--line2)}
+.tg:not(.on){opacity:.45}
+.tg .lg{width:24px;height:24px;border-radius:50%;background:#fff;display:grid;place-items:center;overflow:hidden}.tg .lg img{width:78%;height:78%;object-fit:contain}
+.lc{width:100%;height:auto;display:block;overflow:visible}
+.lc text{font:11.5px var(--sans);fill:var(--tx3)}
+.lc .grid{stroke:var(--line);stroke-width:1}
+.findings{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+@media(max-width:1000px){.findings{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:620px){.findings{grid-template-columns:1fr}}
+.find{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:22px}
+.find .n{font-family:var(--serif);font-size:44px;line-height:1;letter-spacing:-.02em}
+.find h4{font-weight:500;font-size:15px;margin:12px 0 6px}
+.find p{color:var(--tx2);font-size:13.5px}
+.flips{width:100%;border-collapse:collapse;font-size:13px}
+.flips td,.flips th{padding:9px 8px;border-top:1px solid var(--line);text-align:left}
+.flips th{color:var(--tx3);font-weight:400;font-size:12px;border-top:0}
+.flips i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:6px}
+.scroll{overflow-x:auto}
+footer{max-width:1700px;margin:clamp(60px,8vw,110px) auto 0;padding:28px var(--pad) 50px;border-top:1px solid var(--line);color:var(--tx3);font-size:12.5px;display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px}
+footer b{color:var(--tx2);font-weight:500;display:block;margin-bottom:6px}
+
+/* search modal */
+.modal{position:fixed;inset:0;z-index:80;background:rgba(5,5,6,.6);backdrop-filter:blur(8px);display:none;padding:12vh var(--pad) 0}
+.modal.on{display:block}
+.mbox{max-width:600px;margin:auto;background:var(--panel);border:1px solid var(--line2);border-radius:18px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+.mbox input{width:100%;padding:18px 20px;background:none;border:0;border-bottom:1px solid var(--line);color:var(--tx);font:16px var(--sans);outline:0}
+.mlist{max-height:50vh;overflow:auto;padding:6px}
+.mlist small.h{display:block;padding:10px 12px 4px;color:var(--tx3);font-size:11.5px}
+.mlist button{display:flex;align-items:center;gap:12px;width:100%;padding:9px 12px;border-radius:10px;text-align:left}
+.mlist button.on,.mlist button:hover{background:var(--line)}
+.mlist .ab{width:34px;height:34px;border-radius:8px;background:var(--panel2);display:grid;place-items:center;font:600 11px var(--sans);flex:none;overflow:hidden}
+.mlist .ab img{width:100%;height:100%;object-fit:cover;object-position:top}
+.mlist small.s{display:block;color:var(--tx3);font-size:12px}
+.empty{padding:22px;color:var(--tx3);text-align:center}
+
+@media(max-width:1180px){
+  .dash{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  .col.mid{grid-column:1/-1;order:-1}
+  .two{grid-template-columns:1fr}
+}
+@media(max-width:720px){
+  .dash{grid-template-columns:1fr}
+  .topbar{gap:10px}.brand small{display:none}
+  .pills{overflow-x:auto;max-width:100%}
+  .spacer,.nav{display:none}
+  .search{order:5;flex:1}
+  .mapcard{min-height:0}
+  .zoom{display:none}
+  .legend{margin-left:0}
+  .lbl{font-size:11px}
+}
+/* tipografía Montserrat extra-bold */
+.brand,.hero h1,.kpi b,.headline,.big,.sdetail h2,section.blk h2,.find .n,.serif{font-family:var(--serif);font-weight:800;letter-spacing:-.045em}
+.brand{font-size:20px;letter-spacing:-.03em}
+.hero h1{font-size:clamp(36px,5.6vw,84px);line-height:1.02;font-weight:800;color:#f1f6ff;max-width:13em}
+.hero p.lead,.sub{font-weight:400;line-height:1.6}
+.hero p.lead{color:var(--tx2);font-size:clamp(15px,1.5vw,20px)}
+.kpi b{font-size:clamp(30px,3.4vw,46px)}
+.headline{font-size:clamp(22px,2vw,28px);line-height:1.12}
+.big{font-size:clamp(34px,3vw,44px)}
+section.blk h2{font-size:clamp(28px,3.4vw,48px);line-height:1.06;background:linear-gradient(100deg,#f1f6ff 30%,#8fbdf8);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sdetail h2{font-size:24px}
+.find .n{font-size:38px}
+.pill.on{background:linear-gradient(100deg,rgba(79,156,240,.35),rgba(79,156,240,.16));color:#fff}
+.card,.kpis,.find,.timeline,.pills,.search,.btn,.tg{border-color:var(--line)}
+.mbox{background:var(--panel)}
+.eyebrow{font-weight:600;letter-spacing:.16em}
+
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand serif">Mapa Electoral</div>
+  <nav class="pills" id="cargoTabs">
+    <button class="pill on" data-c="pres">Presidencia</button>
+    <button class="pill" data-c="dip">Diputaciones</button>
+    <button class="pill" data-c="sen">Senado</button>
+  </nav>
+  <button class="search" id="openSearch"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg> Buscar <kbd>⌘K</kbd></button>
+  <div class="spacer"></div>
+  <div class="nav"><a href="#tablero">Tablero</a><a href="#partidos">Partidos</a><a href="#hallazgos">Hallazgos</a><a href="#metodo">Método</a></div>
+  <button class="btn" id="fs"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg> Pantalla completa</button>
+</header>
+
+<main>
+<div class="hero">
+  <div class="eyebrow"><i></i> Elecciones federales · México · 2018 · 2021 · 2024</div>
+  <h1>Observatorio Juvenil</h1>
+  <p class="lead">Como han ido cambiando las elecciones de 2018 al 2024 <span style="color:var(--c2)">PAN</span>, <span style="color:var(--c3)">PRI</span> y <span style="color:var(--mc)">Movimiento Ciudadano</span> con los datos del PREP de cada elección.</p>
+  <div class="hero-cta"><a class="btn primary" href="#tablero" style="text-decoration:none">Abrir el tablero →</a><a class="btn" href="#hallazgos" style="text-decoration:none">Ver hallazgos</a></div>
+  <div class="kpis" id="kpis"></div>
+</div>
+
+<div id="tablero" style="scroll-margin-top:70px">
+<div class="dash" id="dash">
+  <div class="col" id="left"></div>
+  <div class="col mid">
+    <div class="card mapcard">
+      <div class="maphead">
+        <div class="pills sm" id="modeTabs">
+          <button class="pill on" data-m="estados">Estados</button>
+          <button class="pill" data-m="ventaja">Ventaja</button>
+        </div>
+        <div class="dd"><button class="pill" id="serieBtn" style="border:1px solid var(--line);border-radius:999px;display:flex;gap:8px;align-items:center"></button><div class="ddmenu" id="serieMenu" hidden></div></div>
+        <div class="legend" id="legend"></div>
+      </div>
+      <div class="mapwrap"><svg class="map" id="map"></svg></div>
+      <div class="zoom"><button id="zin" aria-label="Acercar">+</button><button id="zout" aria-label="Alejar">−</button></div>
+      <div class="timeline"><button class="play" id="play" aria-label="Reproducir"></button><div class="track" id="track"></div><span class="muted" id="tlLabel" style="white-space:nowrap"></span></div>
+    </div>
+  </div>
+  <div class="col" id="right"></div>
+</div>
+</div>
+
+<section class="blk" id="partidos" style="scroll-margin-top:70px">
+  <div class="eyebrow">Trayectoria</div>
+  <h2 style="margin-top:14px">Quién subió, quién cayó y quién se quedó en el camino</h2>
+  <p class="sub">Voto nacional como porcentaje de los votos emitidos. En «Partidos» el voto de coalición se reparte entre sus integrantes; en «Bloques» se muestra cada coalición tal como compitió.</p>
+  <div class="two">
+    <div class="card">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center">
+        <div class="pills sm" id="tCargo"><button class="pill on" data-c="dip">Diputaciones</button><button class="pill" data-c="pres">Presidencia</button><button class="pill" data-c="sen">Senado</button></div>
+        <div class="pills sm" id="tView"><button class="pill on" data-v="partidos">Partidos</button><button class="pill" data-v="bloques">Bloques</button></div>
+      </div>
+      <div class="legendrow" id="tLegend"></div>
+      <div id="tChart"></div>
+    </div>
+    <div class="card">
+      <h3>Participación y votos nulos <span>% de lista nominal · % de votos emitidos</span></h3>
+      <div id="partChart"></div>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="hallazgos" style="scroll-margin-top:70px">
+  <div class="eyebrow">Hallazgos</div>
+  <h2 style="margin-top:14px">Lo que dicen los números</h2>
+  <p class="sub">Cifras calculadas a partir de los archivos del PREP incluidos en la base de datos del proyecto.</p>
+  <div class="findings" id="findings"></div>
+  <div class="card" style="margin-top:14px">
+    <h3>Estados que cambiaron de bloque ganador <span>por cargo y elección</span></h3>
+    <div class="scroll"><table class="flips" id="flips"></table></div>
+  </div>
+</section>
+
+<section class="blk" id="metodo" style="scroll-margin-top:70px;padding-bottom:0">
+  <div class="eyebrow">Método</div>
+  <h2 style="margin-top:14px">Cómo se construyó este mapa</h2>
+</section>
+</main>
+<footer>
+  <div><b>Fuente</b>Archivos del PREP de cada elección: presidencia 2018 y 2024, diputaciones 2018, 2021 y 2024, senadurías 2018 y 2024. Cálculos propios; no sustituyen el cómputo oficial.</div>
+  <div><b>Bloques</b>Cada bloque suma el partido solo más sus combinaciones de coalición, como compitió ese año. Los porcentajes son sobre el total de votos emitidos. Los nombres de los bloques son una asignación a partir de las coaliciones.</div>
+  <div><b>Partidos</b>El voto de cada combinación de coalición se divide en partes iguales entre sus partidos, casilla por casilla (el residuo va al partido con más votos propios). Es una aproximación.</div>
+  <div><b>Alcances</b>Solo mayoría relativa: no incluye representación proporcional. El ganador por estado en diputaciones es informativo; la elección se decide por distrito. Actas sin datos se contaron como cero.</div>
+</footer>
+
+<div class="tip" id="tip"></div>
+<div class="modal" id="modal"><div class="mbox"><input id="q" placeholder="Estado, candidato o partido" autocomplete="off"><div class="mlist" id="mlist"></div></div></div>
+
+<script src="data.js"></script>
+<script>
+(()=>{
+const D=window.DATA, PARTIES=D.parties, MAP=D.map;
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const fmt=new Intl.NumberFormat('es-MX'), pc=(x,d=1)=>(x*100).toFixed(d).replace(/\.0+$/,d?'':'')+'%';
+const pcs=(x,d=1)=>(x*100).toFixed(d);
+const mil=n=>n>=1e6?(n/1e6).toFixed(1)+' millones':fmt.format(n);
+const C1='#e5484d',C2='#3b6cf0',C3='#3da66a',MC='#f7931e';
+
+/* ---------- config ---------- */
+const PCOL={Morena:'#e5484d',PT:'#ff6f91',PVEM:'#8fd14f',PES:'#8e5bd6','PAN':'#3b6cf0',PRI:'#3da66a',PRD:'#f5c518',MC:'#f7931e','Nueva Alianza':'#1fb6c9',RSP:'#e86fb0',FXM:'#c04fd0',Independientes:'#9aa0a6'};
+const PLOGO={Morena:'morena.png',PT:'pt.png',PVEM:'pvem.svg',PAN:'pan.svg',PRI:'pri.png',PRD:'prd.png',MC:'mc.png','Nueva Alianza':'na.svg'};
+const L=n=>'assets/logos/'+n, F=n=>'assets/cand/'+n+'.jpg';
+const CARGO={pres:{n:'Presidencia',years:[2018,2024]},dip:{n:'Diputaciones',years:[2018,2021,2024]},sen:{n:'Senado',years:[2018,2024]}};
+const DATES={2018:'1 de julio de 2018',2021:'6 de junio de 2021',2024:'2 de junio de 2024'};
+const B18=[{id:'b1',s:'Morena y aliados',sub:'PT · Morena · PES',c:C1,lg:['morena.png','pt.png']},{id:'b2',s:'PAN y aliados',sub:'PAN · PRD · MC',c:C2,lg:['pan.svg','prd.png','mc.png']},{id:'b3',s:'PRI y aliados',sub:'PRI · PVEM · Nueva Alianza',c:C3,lg:['pri.png','pvem.svg','na.svg']}];
+const BLOCS={
+ pres2018:[{...B18[0],s:'López Obrador',ph:'amlo'},{...B18[1],s:'Anaya',ph:'anaya'},{...B18[2],s:'Meade',ph:'meade'}],
+ pres2024:[{id:'b1',s:'Sheinbaum',sub:'PVEM · PT · Morena',c:C1,ph:'sheinbaum',lg:['morena.png','pt.png','pvem.svg']},{id:'b2',s:' Xóchitl Gálvez',sub:'PAN · PRI · PRD',c:C2,ph:'galvez',lg:['pan.svg','pri.png','prd.png']},{id:'b3',s:'Máynez',sub:'Movimiento Ciudadano',c:MC,ph:'maynez',lg:['mc.png']}],
+ dip2018:B18,sen2018:B18,
+ dip2021:[{id:'b1',s:'Morena y aliados',sub:'Juntos Hacemos Historia · Morena · PT · PVEM',c:C1,lg:['morena.png','pt.png','pvem.svg']},{id:'b2',s:'PAN, PRI y PRD',sub:'Va por México',c:C2,lg:['pan.svg','pri.png','prd.png']},{id:'b3',s:'Movimiento Ciudadano',sub:'MC',c:MC,lg:['mc.png']}],
+ dip2024:[{id:'b1',s:'Morena y aliados',sub:'Sigamos Haciendo Historia · PVEM · PT · Morena',c:C1,lg:['morena.png','pt.png','pvem.svg']},{id:'b2',s:'PAN, PRI y PRD',sub:'Fuerza y Corazón por México',c:C2,lg:['pan.svg','pri.png','prd.png']},{id:'b3',s:'Movimiento Ciudadano',sub:'MC',c:MC,lg:['mc.png']}]
+};
+BLOCS.sen2024=BLOCS.dip2024;
+const DIST={pres2024:[275,25,0],dip2018:[214,68,18],dip2021:[182,111,7],dip2024:[255,43,1],sen2018:[216,66,18],sen2024:[260,40,0]};
+const EXTRA18=[{s:'Jaime Rodríguez «El Bronco»',sub:'Independiente',ph:'bronco',i:0},{s:'Margarita Zavala',sub:'Independiente',ph:'zavala',i:1}];
+const REGIONS={'Noroeste':['Baja California','Baja California Sur','Sonora','Sinaloa','Chihuahua','Durango'],'Noreste':['Coahuila','Nuevo León','Tamaulipas'],'Occidente y Bajío':['Jalisco','Nayarit','Colima','Michoacán','Guanajuato','Querétaro','Aguascalientes','Zacatecas','San Luis Potosí'],'Centro':['Ciudad de México','México','Morelos','Puebla','Tlaxcala','Hidalgo'],'Sur y Sureste':['Guerrero','Oaxaca','Chiapas','Veracruz','Tabasco','Campeche','Yucatán','Quintana Roo']};
+const AB={'Aguascalientes':'AGS','Baja California':'BC','Baja California Sur':'BCS','Campeche':'CAM','Chiapas':'CHIS','Chihuahua':'CHIH','Ciudad de México':'CDMX','Coahuila':'COAH','Colima':'COL','Durango':'DGO','Guanajuato':'GTO','Guerrero':'GRO','Hidalgo':'HGO','Jalisco':'JAL','Michoacán':'MICH','Morelos':'MOR','México':'EDOMEX','Nayarit':'NAY','Nuevo León':'NL','Oaxaca':'OAX','Puebla':'PUE','Querétaro':'QRO','Quintana Roo':'QROO','San Luis Potosí':'SLP','Sinaloa':'SIN','Sonora':'SON','Tabasco':'TAB','Tamaulipas':'TAMPS','Tlaxcala':'TLAX','Veracruz':'VER','Yucatán':'YUC','Zacatecas':'ZAC'};
+const SMALL=['Aguascalientes','Colima','Morelos','Tlaxcala','Ciudad de México','Querétaro'];
+const NAMES=Object.keys(MAP.paths);
+
+/* ---------- state ---------- */
+const S={cargo:'pres',year:2024,mode:'estados',serie:null,sel:null,zoom:1,tc:'dip',tv:'partidos',playing:null};
+const key=(c=S.cargo,y=S.year)=>c+y;
+const E=(c=S.cargo,y=S.year)=>D.els[key(c,y)];
+const blocs=(c=S.cargo,y=S.year)=>BLOCS[key(c,y)];
+const bsh=(r,i)=>r.b[i]/r.total;
+const win=r=>{let m=0;for(let i=1;i<3;i++)if(r.b[i]>r.b[m])m=i;return m};
+const margin=r=>{const v=[...r.b].sort((a,b)=>b-a);return (v[0]-v[1])/r.total*100};
+const mix=(h,t)=>{const a=[13,25,56],n=parseInt(h.slice(1),16),b=[n>>16,n>>8&255,n&255];return 'rgb('+a.map((x,i)=>Math.round(x+(b[i]-x)*t)).join(',')+')'};
+const mtone=m=>m<10?.38:m<25?.58:m<45?.8:1;
+const series=()=>{
+  const bl=blocs(), nat=E().nat, out=bl.map((b,i)=>({id:'b'+i,label:b.s,sub:b.sub,c:b.c,lg:b.lg,get:r=>r.b[i]/r.total,nat:nat.b[i]/nat.total,bloc:true}));
+  PARTIES.forEach((p,i)=>{const sh=nat.p[i]/nat.total;if(sh>0.012&&p!=='Independientes')out.push({id:'p'+i,label:p,c:PCOL[p],lg:PLOGO[p]?[PLOGO[p]]:[],get:r=>r.p[i]/r.total,nat:sh})});
+  return out;
+};
+const curSerie=()=>{const s=series();return s.find(x=>x.id===S.serie)||null};
+
+/* ---------- helpers ---------- */
+const imgFace=(b,cls='face')=>b.ph?`<img class="${cls}" src="${F(b.ph)}" alt="${b.s}">`:`<div class="logos">${(b.lg||[]).slice(0,2).map(l=>`<span><img src="${L(l)}" alt=""></span>`).join('')}</div>`;
+const logosOf=b=>`<div class="logos">${(b.lg||[]).map(l=>`<span><img src="${L(l)}" alt=""></span>`).join('')}</div>`;
+const prevYear=()=>{const ys=CARGO[S.cargo].years,i=ys.indexOf(S.year);return i>0?ys[i-1]:null};
+const stateWins=()=>{const w=[0,0,0];NAMES.forEach(n=>w[win(E().states[n])]++);return w};
+
+/* ---------- hero ---------- */
+function hero(){
+  const n=E('pres',2024).nat, p=D.els.dip2021.nat;
+  const k=[
+    [mil(n.total).replace(' millones',''),'M','votos emitidos en la presidencial de 2024',[n.b[0]/n.total,n.b[1]/n.total,n.b[2]/n.total],[C1,C2,MC]],
+    [pcs(n.b[0]/n.total),'%','obtuvo la coalición ganadora en la presidencia de 2024',null],
+    [''+stateWins2('pres',2024)[0],'/32','estados ganó en 2024 el bloque de Morena y aliados',null],
+    [pcs(p.total/p.lista),'%','participación en 2021, la más baja de las siete elecciones',null]];
+  $('#kpis').innerHTML=k.map(x=>`<div class="kpi"><b class="num">${x[0]}<sup>${x[1]}</sup></b><span>${x[2]}</span>${x[3]?`<div class="strip">${x[3].map((v,i)=>`<i style="width:${v*100}%;background:${x[4][i]}"></i>`).join('')}</div>`:''}</div>`).join('');
+}
+function stateWins2(c,y){const w=[0,0,0];NAMES.forEach(n=>w[win(D.els[c+y].states[n])]++);return w}
+
+/* ---------- left panel ---------- */
+function left(){
+  const e=E(), bl=blocs(), nat=e.nat, sh=bl.map((b,i)=>nat.b[i]/nat.total);
+  const ord=[0,1,2].sort((a,b)=>sh[b]-sh[a]), w=ord[0], r=ord[1], sw=stateWins();
+  const d=DIST[key()];
+  let head,sub;
+  const col=(i,t)=>`<span style="color:${bl[i].c}">${t}</span>`;
+  if(S.cargo==='pres') head=`${col(w,bl[w].s)} gana la Presidencia${S.year===2024?'':''}`;
+  else if(S.cargo==='dip') head=`${col(w,bl[w].s)} ${S.year===2021?'ganan':'ganan'} ${d[w]} de 300 distritos`;
+  else head=`${col(w,bl[w].s)} ${sw[w]===1?'gana':'ganan'} ${sw[w]} de 32 estados`;
+  const last=bl.length,vv=nat.total-nat.nulos-nat.nr;
+  const side=(i,right)=>`<div class="side ${right?'r':''}"><div class="who">${imgFace(bl[i])}<div><b>${bl[i].s}</b><small class="dim">${bl[i].sub}</small></div></div><div><div class="big num" style="color:${bl[i].c}">${pcs(sh[i])}<sup>%</sup></div><div class="vs num" style="margin-top:6px">${fmt.format(nat.b[i])} votos</div></div></div>`;
+  const diff=(sh[w]-sh[r])*100;
+  const others=[...ord.slice(2).map(i=>({...bl[i],v:nat.b[i],sh:sh[i]})),...(S.cargo==='pres'&&S.year===2018?EXTRA18.map(x=>({...x,v:nat.ind[x.i],sh:nat.ind[x.i]/nat.total,c:'#9aa0a6'})):[])].sort((a,b)=>b.sh-a.sh);
+  const nulo=nat.nulos/nat.total;
+  $('#left').innerHTML=`
+  <div class="card">
+    <div class="ctx"><span>${CARGO[S.cargo].n} · México</span><span class="tag">● Elección del ${DATES[S.year]}</span></div>
+    <div class="headline">${head}</div>
+    <div class="duel">${side(w,false)}${side(r,true)}</div>
+    <div class="tug" title="Diferencia entre primero y segundo lugar"><i style="width:${sh[w]/(sh[w]+sh[r])*100}%;background:${bl[w].c}"></i><i style="width:${sh[r]/(sh[w]+sh[r])*100}%;background:${bl[r].c}"></i></div>
+    <div class="dl"><span>Diferencia</span><b class="num">${diff.toFixed(1)} puntos · ${mil(nat.b[w]-nat.b[r])} de votos</b></div>
+    ${d?`<div class="dl"><span>Distritos federales ganados</span><b class="num">${bl.map((b,i)=>`<span style="color:${b.c}">${d[i]}</span>`).join(' · ')}</b></div>`:''}
+    <div class="dl"><span>Estados en primer lugar</span><b class="num">${bl.map((b,i)=>`<span style="color:${b.c}">${sw[i]}</span>`).join(' · ')}</b></div>
+    <div class="rows" style="margin-top:12px">${others.map(o=>`<div class="row">${imgFace(o)}<div class="t"><b>${o.s}</b><small>${o.sub}</small></div><div class="v num">${pcs(o.sh)}%<small>${fmt.format(o.v)}</small></div></div>`).join('')}</div>
+    <div class="stats3" style="margin-top:14px;border-top:1px solid var(--line);padding-top:14px">
+      <div><small>Votos válidos</small><b class="num">${fmt.format(vv)}</b></div>
+      <div><small>Participación</small><b class="num">${pcs(nat.total/nat.lista)}%</b></div>
+      <div><small>Nulos</small><b class="num">${pcs(nulo)}%</b></div></div>
+  </div>
+  <div class="card"><h3>Evolución del voto <span>${CARGO[S.cargo].n}, % nacional</span></h3><div id="evo"></div>
+    <div class="chips">${bl.map(b=>`<span class="chip"><i style="background:${b.c}"></i>${b.s}</span>`).join('')}</div></div>`;
+  const ys=CARGO[S.cargo].years;
+  lineChart($('#evo'),ys.map(String),bl.map((b,i)=>({c:b.c,pts:ys.map(y=>{const n=D.els[S.cargo+y].nat;const bb=BLOCS[S.cargo+y][i];return n.b[i]/n.total})})),{h:200,w:340,hl:ys.indexOf(S.year)});
+}
+
+/* ---------- line chart ---------- */
+function lineChart(el,xl,sr,o={}){
+  const W=o.w||560,H=o.h||260,m={l:38,r:o.labels?40:16,t:14,b:26};
+  const all=sr.flatMap(s=>s.pts).filter(v=>v!=null);
+  let mx=Math.max(...all)*1.12,mn=0;
+  const step=mx>.45?.1:mx>.25?.05:.025; mx=Math.ceil(mx/step)*step;
+  const X=i=>m.l+(xl.length===1?0:i/(xl.length-1))*(W-m.l-m.r), Y=v=>m.t+(1-(v-mn)/(mx-mn))*(H-m.t-m.b);
+  let g='';for(let v=0;v<=mx+1e-9;v+=step)g+=`<line class="grid" x1="${m.l}" x2="${W-m.r}" y1="${Y(v)}" y2="${Y(v)}"/><text x="${m.l-8}" y="${Y(v)+4}" text-anchor="end">${Math.round(v*100)}%</text>`;
+  g+=xl.map((t,i)=>`<text x="${X(i)}" y="${H-6}" text-anchor="middle" ${i===o.hl?'style="fill:var(--tx)"':''}>${t}</text>`).join('');
+  if(o.hl!=null&&xl.length>1)g+=`<line x1="${X(o.hl)}" x2="${X(o.hl)}" y1="${m.t}" y2="${H-m.b}" stroke="var(--line2)" stroke-dasharray="3 4"/>`;
+  const lab={};
+  if(o.labels){[sr[0].pts.length-1].forEach(ix=>{const a=sr.map((s,k)=>({k,y:s.pts[ix]==null?null:Y(s.pts[ix])})).filter(z=>z.y!=null).sort((p,q)=>p.y-q.y);
+    for(let j=1;j<a.length;j++)if(a[j].y-a[j-1].y<12)a[j].y=a[j-1].y+12;
+    a.forEach(z=>lab[z.k+'_'+ix]=z.y)})}
+  sr.forEach((s,k)=>{
+    const pts=s.pts.map((v,i)=>v==null?null:[X(i),Y(v)]).filter(Boolean);
+    if(pts.length>1)g+=`<path d="M${pts.map(p=>p.join(',')).join('L')}" fill="none" stroke="${s.c}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round" opacity="${s.dim?.25:1}"/>`;
+    s.pts.forEach((v,i)=>{if(v==null)return;g+=`<circle cx="${X(i)}" cy="${Y(v)}" r="${i===o.hl?4.5:3.2}" fill="${s.c}" stroke="var(--panel)" stroke-width="2"><title>${s.t||''} ${xl[i]}: ${(v*100).toFixed(1)}%</title></circle>`;
+      if(o.labels&&i===s.pts.length-1)g+=`<text x="${X(i)+(i?8:-8)}" y="${(lab[k+'_'+i]??Y(v))+4}" text-anchor="${i?'start':'end'}" style="fill:${s.c};font-weight:500">${(v*100).toFixed(1)}</text>`});
+  });
+  el.innerHTML=`<svg class="lc" viewBox="0 0 ${W} ${H}">${g}</svg>`;
+}
+
+/* ---------- map ---------- */
+const svg=$('#map');
+function buildMap(){
+  svg.setAttribute('viewBox',`0 0 ${MAP.w+10} ${MAP.h}`);
+  let h='<g id="zg">';
+  NAMES.forEach(n=>h+=`<path class="st" data-n="${n}" d="${MAP.paths[n]}" fill="#0d1938"/>`);
+  h+='<g id="lbls">';
+  NAMES.filter(n=>!SMALL.includes(n)).forEach(n=>{const c=MAP.cents[n];h+=`<g class="lb" data-n="${n}" transform="translate(${c[0]},${c[1]})"><text class="lbl" y="-2">${AB[n]}</text><text class="lbl p" y="11"></text></g>`});
+  h+='</g></g><g id="pills">';
+  const RIGHT=['Tlaxcala','Ciudad de México','Morelos'];
+  SMALL.forEach(n=>{const c=MAP.cents[n],r=RIGHT.includes(n),i=r?RIGHT.indexOf(n):SMALL.filter(x=>!RIGHT.includes(x)).indexOf(n);
+    const px=r?MAP.w-120:14,py=r?MAP.h*.4+i*28:MAP.h*.72+i*28,ex=r?px:px+104;
+    h+=`<g class="pillbox" data-n="${n}"><path class="callout" d="M${c[0]},${c[1]} L${ex},${py+10.5}"/><rect x="${px}" y="${py}" width="104" height="21" fill="#12214a"/><text x="${px+8}" y="${py+14.5}">${AB[n]}</text><text class="pv" x="${px+96}" y="${py+14.5}" text-anchor="end"></text></g>`});
+  svg.innerHTML=h+'</g>';
+}
+function paintMap(){
+  const e=E(), bl=blocs(), se=curSerie(), tip=$('#tip');
+  let mxv=0; if(S.mode==='serie'&&se) NAMES.forEach(n=>mxv=Math.max(mxv,se.get(e.states[n])));
+  NAMES.forEach(n=>{
+    const r=e.states[n]; let fill,txt;
+    if(S.mode==='serie'&&se){const v=se.get(r);fill=mix(se.c,.12+.88*v/mxv);txt=pcs(v,0)}
+    else{const w=win(r),m=margin(r);fill=mix(bl[w].c,S.mode==='estados'?.82:mtone(m));txt=pcs(bsh(r,w),0)}
+    $$(`[data-n="${n}"]`,svg).forEach(el=>{
+      if(el.classList.contains('st'))el.style.fill=fill;
+      else if(el.classList.contains('pillbox'))el.querySelector('rect').style.fill=fill,el.querySelector('.pv').textContent=txt+'%';
+      else if(el.classList.contains('lb'))el.querySelector('.p').textContent=txt+'%';
+    });
+  });
+  svg.classList.toggle('hasSel',!!S.sel);
+  $$('.st',svg).forEach(p=>p.classList.toggle('sel',p.dataset.n===S.sel));
+  // legend
+  const w=stateWins();
+  let lg='';
+  if(S.mode==='serie'&&se) lg=`<span><span class="dot" style="background:${se.c}"></span>% del voto en cada estado</span><span class="scale">${[.25,.45,.65,.85,1].map(t=>`<i style="background:${mix(se.c,t)}"></i>`).join('')}</span><span>menos · más</span>`;
+  else{
+    lg=bl.map((b,i)=>w[i]?`<span><span class="dot" style="background:${b.c}"></span>${b.s.split(' y ')[0]} <b class="num">${w[i]}</b></span>`:'').join('')+'<span>estados</span>';
+    if(S.mode==='ventaja')lg+=`<span class="scale">${[.38,.58,.8,1].map(t=>`<i style="background:${mix(bl[0].c,t)}"></i>`).join('')}</span><span>hasta 10 · 25 · 45 · más pts</span>`;
+  }
+  $('#legend').innerHTML=lg;
+  // serie button
+  $('#serieBtn').innerHTML=se?`<span class="dot" style="display:inline-block;width:9px;height:9px;border-radius:2px;background:${se.c}"></span>${se.label}<span class="dim">▾</span>`:`Partido o bloque <span class="dim">▾</span>`;
+  $('#serieBtn').classList.toggle('on',S.mode==='serie');
+  $$('#modeTabs .pill').forEach(b=>b.classList.toggle('on',b.dataset.m===S.mode));
+}
+function tipHtml(n){
+  const e=E(),r=e.states[n],bl=blocs();
+  return `<b>${n}</b>`+bl.map((b,i)=>`<div><span><i style="background:${b.c}"></i>${b.s}</span><span>${pcs(bsh(r,i))}%</span></div>`).join('')+`<div style="margin-top:6px"><span>Participación</span><span>${pcs(r.total/r.lista)}%</span></div>`;
+}
+svg.addEventListener('mousemove',ev=>{
+  const t=ev.target.closest('[data-n]'),tip=$('#tip');
+  if(!t){tip.style.opacity=0;return}
+  tip.innerHTML=tipHtml(t.dataset.n);tip.style.opacity=1;
+  const x=Math.min(ev.clientX+16,innerWidth-230),y=Math.min(ev.clientY+16,innerHeight-170);
+  tip.style.left=x+'px';tip.style.top=y+'px';
+});
+svg.addEventListener('mouseleave',()=>$('#tip').style.opacity=0);
+svg.addEventListener('click',ev=>{const t=ev.target.closest('[data-n]');select(t?t.dataset.n:null)});
+function setZoom(z){
+  S.zoom=Math.max(1,Math.min(2.2,z));
+  
+  $('#zg').style.transition='transform .3s';$('#zg').style.transformOrigin='50% 50%';
+  $('#zg').style.transform=`scale(${S.zoom})`;
+}
+$('#zin').onclick=()=>setZoom(S.zoom+.35);$('#zout').onclick=()=>setZoom(S.zoom-.35);
+
+/* ---------- right ---------- */
+function regionData(){
+  const e=E();
+  return Object.entries(REGIONS).map(([nm,sts])=>{
+    const b=[0,0,0];let tot=0;sts.forEach(s=>{const r=e.states[s];for(let i=0;i<3;i++)b[i]+=r.b[i];tot+=r.total});
+    const sh=b.map(v=>v/tot),w=sh.indexOf(Math.max(...sh)),s2=[...sh].sort((a,b)=>b-a);
+    return {nm,sh,w,m:(s2[0]-s2[1])*100};
+  });
+}
+function right(){
+  const e=E(),bl=blocs();
+  if(S.sel){stateDetail();return}
+  const prev=prevYear();
+  const reg=regionData(),pr=prev?(()=>{const pe=E(S.cargo,prev),o={};Object.entries(REGIONS).forEach(([nm,sts])=>{let b=0,t=0;sts.forEach(s=>{const r=pe.states[s];b+=r.b[0];t+=r.total});o[nm]=b/t});return o})():null;
+  const flips=changesFeed();
+  $('#right').innerHTML=`
+  <div class="card"><h3>Por región <span>quién lidera</span></h3>
+    ${reg.map(r=>{const b=bl[r.w],d=pr?(r.sh[0]-pr[r.nm])*100:null,mm=Math.min(50,r.m);
+      return `<div class="region"><div class="nm">${r.nm}</div><div class="ld"><i style="background:${b.c}"></i><span>${b.s.split(' y ')[0]}</span><b>${pcs(r.sh[r.w])}%</b></div>
+      <div class="bar"><u></u><b style="background:${b.c};${r.w===0?`left:50%;width:${mm}%`:`right:50%;width:${mm}%`}"></b></div>
+      ${d!=null?`<small class="dim" style="grid-column:1/-1;margin-top:4px">Bloque de Morena: <span class="delta ${d>=0?'up':'dn'}">${d>=0?'+':''}${d.toFixed(1)} pts</span> vs ${prev}</small>`:''}</div>`}).join('')}
+    <div class="dim" style="font-size:11.5px;margin-top:6px">La barra muestra la ventaja del primer lugar sobre el segundo.</div>
+  </div>
+  <div class="card feed"><h3>Lo que cambió <span>${prev?`vs ${prev}`:'primera elección de la serie'}</span></h3>${flips}</div>`;
+}
+function changesFeed(){
+  const prev=prevYear(),e=E(),bl=blocs();
+  const items=[];
+  if(!prev){
+    const top=[...NAMES].sort((a,b)=>margin(e.states[b])-margin(e.states[a]));
+    items.push(['',`<em>${top[0]}</em> fue la victoria más amplia de ${bl[win(e.states[top[0]])].s}: ${margin(e.states[top[0]]).toFixed(1)} puntos.`]);
+    const cl=[...NAMES].sort((a,b)=>margin(e.states[a])-margin(e.states[b]));
+    cl.slice(0,3).forEach(n=>items.push(['',`<em>${n}</em>: la más cerrada, ${margin(e.states[n]).toFixed(1)} puntos entre ${bl[win(e.states[n])].s} y el segundo lugar.`]));
+    items.push(['',`Participación nacional de <em>${pcs(e.nat.total/e.nat.lista)}%</em>.`]);
+  }else{
+    const pe=E(S.cargo,prev),pb=blocs(S.cargo,prev);
+    const fl=NAMES.filter(n=>win(pe.states[n])!==win(e.states[n]));
+    items.push(['',fl.length?`<em>${fl.length} estados</em> cambiaron de bloque ganador.`:`Ningún estado cambió de bloque ganador.`]);
+    fl.slice(0,5).forEach(n=>items.push(['',`<em>${n}</em>: ${pb[win(pe.states[n])].s} → <span style="color:${bl[win(e.states[n])].c}">${bl[win(e.states[n])].s}</span>`]));
+    const sw=NAMES.map(n=>[n,(bsh(e.states[n],0)-bsh(pe.states[n],0))*100]).sort((a,b)=>b[1]-a[1]);
+    const f=(a)=>`<em>${a[0]}</em> <span class="delta ${a[1]>=0?'up':'dn'}">${a[1]>=0?'+':''}${a[1].toFixed(1)}</span>`;
+    items.push(['pts',`Mayor alza del bloque de Morena: ${sw.slice(0,3).map(f).join(', ')}.`]);
+    items.push(['pts',`Mayor caída: ${sw.slice(-3).reverse().map(f).join(', ')}.`]);
+    const dp=(e.nat.total/e.nat.lista-pe.nat.total/pe.nat.lista)*100;
+    items.push(['',`Participación nacional <span class="delta ${dp>=0?'up':'dn'}">${dp>=0?'+':''}${dp.toFixed(1)} pts</span> (${pcs(e.nat.total/e.nat.lista)}%).`]);
+  }
+  return items.map(i=>`<div class="it"><time>${i[0]}</time><div>${i[1]}</div></div>`).join('');
+}
+function stateDetail(){
+  const n=S.sel,e=E(),r=e.states[n],bl=blocs(),prev=prevYear(),pe=prev?E(S.cargo,prev).states[n]:null;
+  const ord=[0,1,2].sort((a,b)=>r.b[b]-r.b[a]),ys=CARGO[S.cargo].years;
+  const rank=[...NAMES].sort((a,b)=>E().states[b].total/E().states[b].lista-E().states[a].total/E().states[a].lista).indexOf(n)+1;
+  $('#right').innerHTML=`<div class="card sdetail">
+    <div class="top"><div class="ab">${AB[n]}</div><div><h2>${n}</h2><div class="muted" style="font-size:12.5px;margin-top:4px">${mil(r.total)} de votos · ${pcs(r.total/r.lista)}% de participación</div></div><button class="x" id="clr" aria-label="Cerrar">✕</button></div>
+    <div class="dim" style="font-size:12px;margin:14px 0 4px">${CARGO[S.cargo].n} ${S.year}</div>
+    <div class="rows">${ord.map(i=>{const d=pe?(bsh(r,i)-bsh(pe,i))*100:null;return `<div class="row">${imgFace(bl[i])}<div class="t"><b>${bl[i].s}</b><small>${bl[i].sub}</small></div><div class="v num" style="color:${bl[i].c}">${pcs(bsh(r,i))}%<small>${d!=null?`<span class="delta ${d>=0?'up':'dn'}">${d>=0?'+':''}${d.toFixed(1)} pts</span>`:fmt.format(r.b[i])}</small></div></div>`}).join('')}</div>
+    <div class="tug" style="margin-top:14px">${ord.map(i=>`<i style="width:${r.b[i]/r.total*100}%;background:${bl[i].c}"></i>`).join('')}</div>
+    <div class="dl"><span>Margen de victoria</span><b class="num">${margin(r).toFixed(1)} pts</b></div>
+    <div class="dl"><span>Votos nulos</span><b class="num">${pcs(r.nulos/r.total)}%</b></div>
+    <div class="dl"><span>Lista nominal</span><b class="num">${fmt.format(r.lista)}</b></div>
+    <div class="dl"><span>Participación entre estados</span><b class="num">lugar ${rank} de 32</b></div>
+  </div>
+  <div class="card"><h3>Trayectoria en ${n} <span>${CARGO[S.cargo].n}</span></h3><div id="sevo"></div></div>
+  <button class="btn" id="clr2" style="justify-content:center">← Volver a la vista nacional</button>`;
+  lineChart($('#sevo'),ys.map(String),[0,1,2].map(i=>({c:BLOCS[key(S.cargo,S.year)][i].c,pts:ys.map(y=>{const q=D.els[S.cargo+y].states[n];return q.b[i]/q.total})})),{h:190,hl:ys.indexOf(S.year),labels:true,w:340});
+  $('#clr').onclick=$('#clr2').onclick=()=>select(null);
+}
+
+/* ---------- timeline ---------- */
+function timeline(){
+  const ys=CARGO[S.cargo].years,a=ys[0],b=ys[ys.length-1],pos=y=>(y-a)/(b-a)*100;
+  const tr=$('#track');
+  tr.innerHTML=`<div class="fill" style="width:${pos(S.year)}%"></div>`+ys.map(y=>`<div class="tick ${y===S.year?'on':''} ${y<S.year?'past':''}" style="left:${pos(y)}%" data-y="${y}"><i></i>${y}</div>`).join('');
+  tr.style.margin='0 18px';
+  $('#tlLabel').textContent=DATES[S.year];
+  $('#play').innerHTML=S.playing?'<svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><rect x="1" y="1" width="3.5" height="10"/><rect x="7.5" y="1" width="3.5" height="10"/></svg>':'<svg width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M2 1l9 5-9 5z"/></svg>';
+}
+$('#track').addEventListener('click',ev=>{const t=ev.target.closest('.tick');if(t)setYear(+t.dataset.y)});
+$('#play').onclick=()=>{
+  if(S.playing){clearInterval(S.playing);S.playing=null;timeline();return}
+  const ys=CARGO[S.cargo].years;let i=0;setYear(ys[0]);
+  S.playing=setInterval(()=>{i++;if(i>=ys.length){clearInterval(S.playing);S.playing=null;timeline();return}setYear(ys[i])},1400);timeline();
+};
+function setYear(y){S.year=y;render()}
+
+/* ---------- controls ---------- */
+function setCargo(c){
+  clearInterval(S.playing);S.playing=null;
+  S.cargo=c;const ys=CARGO[c].years;if(!ys.includes(S.year))S.year=ys[ys.length-1];
+  if(S.mode==='serie'&&!curSerie())S.mode='estados';
+  $$('#cargoTabs .pill').forEach(b=>b.classList.toggle('on',b.dataset.c===c));
+  render();
+}
+$('#cargoTabs').onclick=ev=>{const b=ev.target.closest('.pill');if(b)setCargo(b.dataset.c)};
+$('#modeTabs').onclick=ev=>{const b=ev.target.closest('.pill');if(b){S.mode=b.dataset.m;paintMap()}};
+const menu=$('#serieMenu');
+$('#serieBtn').onclick=ev=>{ev.stopPropagation();
+  if(!menu.hidden){menu.hidden=true;return}
+  const ss=series();
+  menu.innerHTML=`<div class="dim" style="padding:6px 10px;font-size:11.5px">Bloques</div>`+ss.filter(s=>s.bloc).map(mi).join('')+`<div class="dim" style="padding:10px 10px 6px;font-size:11.5px">Partidos (voto de coalición repartido)</div>`+ss.filter(s=>!s.bloc).map(mi).join('');
+  menu.hidden=false;
+};
+function mi(s){return `<button data-s="${s.id}" class="${s.id===S.serie&&S.mode==='serie'?'on':''}"><i style="width:10px;height:10px;border-radius:3px;background:${s.c};flex:none"></i><span>${s.label}</span><span class="pc num">${pcs(s.nat)}%</span></button>`}
+menu.onclick=ev=>{const b=ev.target.closest('button');if(!b)return;S.serie=b.dataset.s;S.mode='serie';menu.hidden=true;paintMap()};
+document.addEventListener('click',()=>menu.hidden=true);
+function select(n){S.sel=n===S.sel?null:n;paintMap();right()}
+$('#fs').onclick=()=>{const el=$('#tablero');document.fullscreenElement?document.exitFullscreen():el.requestFullscreen&&el.requestFullscreen()};
+document.addEventListener('fullscreenchange',()=>$('#dash').classList.toggle('full',!!document.fullscreenElement));
+
+/* ---------- search ---------- */
+const modal=$('#modal'),q=$('#q'),ml=$('#mlist');
+const CANDS=[{s:'Claudia Sheinbaum',sub:'Presidencia 2024 · Morena, PT, PVEM',ph:'sheinbaum',c:'pres',y:2024,i:0},{s:'Xóchitl Gálvez',sub:'Presidencia 2024 · PAN, PRI, PRD',ph:'galvez',c:'pres',y:2024,i:1},{s:'Jorge Álvarez Máynez',sub:'Presidencia 2024 · Movimiento Ciudadano',ph:'maynez',c:'pres',y:2024,i:2},{s:'Andrés Manuel López Obrador',sub:'Presidencia 2018 · PT, Morena, PES',ph:'amlo',c:'pres',y:2018,i:0},{s:'Ricardo Anaya',sub:'Presidencia 2018 · PAN, PRD, MC',ph:'anaya',c:'pres',y:2018,i:1},{s:'José Antonio Meade',sub:'Presidencia 2018 · PRI, PVEM, Nueva Alianza',ph:'meade',c:'pres',y:2018,i:2},{s:'Jaime Rodríguez «El Bronco»',sub:'Presidencia 2018 · Independiente',ph:'bronco',c:'pres',y:2018,x:true},{s:'Margarita Zavala',sub:'Presidencia 2018 · Independiente',ph:'zavala',c:'pres',y:2018,x:true}];
+let ml_items=[],mi_i=0;
+function openSearch(){modal.classList.add('on');q.value='';fillSearch();q.focus()}
+function closeSearch(){modal.classList.remove('on')}
+function fillSearch(){
+  const t=q.value.trim().toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,''),nm=s=>s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'');
+  const st=NAMES.filter(n=>nm(n).includes(t)||nm(AB[n]).includes(t)).map(n=>({k:'s',n}));
+  const cd=CANDS.filter(c=>nm(c.s).includes(t)).map(c=>({k:'c',c}));
+  const pt=PARTIES.filter(p=>p!=='Independientes'&&nm(p).includes(t)).map(p=>({k:'p',p}));
+  ml_items=[...st,...cd,...pt];mi_i=0;
+  const sec=(k,h)=>{const a=ml_items.filter(x=>x.k===k);return a.length?`<small class="h">${h}</small>`+a.map(x=>itemHtml(x)).join(''):''};
+  ml.innerHTML=ml_items.length?sec('s','Estados')+sec('c','Candidatos')+sec('p','Partidos'):'<div class="empty">Sin resultados</div>';
+  $$('button',ml).forEach(b=>b.classList.toggle('on',+b.dataset.i===mi_i));
+}
+function itemHtml(x){const i=ml_items.indexOf(x);
+  if(x.k==='s'){const r=E().states[x.n];return `<button data-i="${i}"><span class="ab">${AB[x.n]}</span><span><b style="font-weight:500">${x.n}</b><small class="s">Estado · ${mil(r.total)} de votos</small></span></button>`}
+  if(x.k==='c')return `<button data-i="${i}"><span class="ab"><img src="${F(x.c.ph)}" alt=""></span><span><b style="font-weight:500">${x.c.s}</b><small class="s">${x.c.sub}</small></span></button>`;
+  return `<button data-i="${i}"><span class="ab" style="background:#fff;padding:5px">${PLOGO[x.p]?`<img src="${L(PLOGO[x.p])}" style="object-fit:contain" alt="">`:x.p}</span><span><b style="font-weight:500">${x.p}</b><small class="s">Partido · ver su voto en el mapa</small></span></button>`}
+function pick(x){
+  closeSearch();$('#tablero').scrollIntoView();
+  if(x.k==='s'){S.sel=x.n;paintMap();right()}
+  else if(x.k==='c'){setCargo('pres');S.year=x.c.y;if(x.c.x){S.mode='estados'}else{S.mode='serie';S.serie='b'+x.c.i}S.sel=null;render()}
+  else{const idx=PARTIES.indexOf(x.p);S.year=CARGO[S.cargo].years.includes(S.year)?S.year:2024;const ss=series();const s=ss.find(z=>z.id==='p'+idx);if(s){S.mode='serie';S.serie=s.id;S.sel=null;render()}else{S.mode='estados';render()}}
+}
+q.oninput=fillSearch;
+ml.onclick=ev=>{const b=ev.target.closest('button');if(b)pick(ml_items[+b.dataset.i])};
+$('#openSearch').onclick=openSearch;
+modal.onclick=ev=>{if(ev.target===modal)closeSearch()};
+document.addEventListener('keydown',ev=>{
+  if((ev.metaKey||ev.ctrlKey)&&ev.key.toLowerCase()==='k'){ev.preventDefault();openSearch();return}
+  if(!modal.classList.contains('on'))return;
+  if(ev.key==='Escape')closeSearch();
+  else if(ev.key==='ArrowDown'||ev.key==='ArrowUp'){ev.preventDefault();mi_i=(mi_i+(ev.key==='ArrowDown'?1:-1)+ml_items.length)%ml_items.length;$$('button',ml).forEach(b=>{const on=+b.dataset.i===mi_i;b.classList.toggle('on',on);if(on)b.scrollIntoView({block:'nearest'})})}
+  else if(ev.key==='Enter'&&ml_items[mi_i])pick(ml_items[mi_i]);
+});
+
+/* ---------- trajectory section ---------- */
+function trajectory(){
+  const c=S.tc,ys=CARGO[c].years;
+  let sr;
+  if(S.tv==='partidos'){
+    const ps=PARTIES.map((p,i)=>({p,i})).filter(o=>!['Independientes','PES','Nueva Alianza','RSP','FXM'].includes(o.p));
+    TS.sel=TS.sel||new Set(['Morena','PAN','PRI','MC','PVEM','PT','PRD']);
+    sr=ps.map(o=>({id:o.p,t:o.p,label:o.p,c:PCOL[o.p],lg:PLOGO[o.p],dim:!TS.sel.has(o.p),pts:ys.map(y=>{const n=D.els[c+y].nat;return n.p[o.i]/n.total})}));
+  }else{
+    sr=[0,1,2].map(i=>({id:'b'+i,t:['Morena y aliados','PAN y aliados','Tercer bloque'][i],label:['Morena y aliados','PAN y aliados','Tercer bloque (PRI en 2018, MC desde 2021)'][i],c:[C1,C2,C3][i],lg:null,dim:false,pts:ys.map(y=>{const n=D.els[c+y].nat;return n.b[i]/n.total}),third:i===2}));
+    // third bloc color changes: keep neutral gradient: use MC orange from 2021
+  }
+  $('#tLegend').innerHTML=sr.map(s=>`<button class="tg ${s.dim?'':'on'}" data-id="${s.id}" ${S.tv==='bloques'?'disabled style="cursor:default;opacity:1;color:var(--tx)"':''}>${s.lg?`<span class="lg"><img src="${L(s.lg)}" alt=""></span>`:`<span class="lg" style="background:${s.c};width:14px;height:14px;margin:0 2px 0 6px"></span>`}${s.label}</button>`).join('');
+  const vis=sr.filter(s=>!s.dim);
+  lineChart($('#tChart'),ys.map(String),vis.map(s=>({...s,dim:false})),{w:760,h:340,labels:true});
+}
+const TS={sel:null};
+$('#tCargo').onclick=ev=>{const b=ev.target.closest('.pill');if(!b)return;S.tc=b.dataset.c;$$('#tCargo .pill').forEach(x=>x.classList.toggle('on',x===b));trajectory()};
+$('#tView').onclick=ev=>{const b=ev.target.closest('.pill');if(!b)return;S.tv=b.dataset.v;$$('#tView .pill').forEach(x=>x.classList.toggle('on',x===b));trajectory()};
+$('#tLegend').onclick=ev=>{const b=ev.target.closest('.tg');if(!b||b.disabled)return;const id=b.dataset.id;TS.sel.has(id)?TS.sel.delete(id):TS.sel.add(id);if(!TS.sel.size)TS.sel.add(id);trajectory()};
+
+function participation(){
+  const list=[['pres',2018],['dip',2018],['sen',2018],['dip',2021],['pres',2024],['dip',2024],['sen',2024]];
+  const nm={pres:'Presidencia',dip:'Diputaciones',sen:'Senado'};
+  const W=520,rowH=44;
+  let h='';
+  list.sort((a,b)=>a[1]-b[1]||['pres','dip','sen'].indexOf(a[0])-['pres','dip','sen'].indexOf(b[0])).forEach(([c,y],i)=>{
+    const n=D.els[c+y].nat,p=n.total/n.lista,nu=n.nulos/n.total;
+    h+=`<div style="display:grid;grid-template-columns:104px 1fr 54px;gap:12px;align-items:center;padding:8px 0;border-top:${i?'1px solid var(--line)':'0'}"><div><b style="font-weight:500">${nm[c]}</b><small class="dim" style="display:block">${y}</small></div><div style="height:8px;background:var(--line);border-radius:4px;position:relative"><i style="position:absolute;inset:0 auto 0 0;width:${p*100}%;background:${y===2021?'var(--mc)':'var(--tx)'};border-radius:4px"></i></div><div class="num" style="text-align:right"><b style="font-weight:500">${pcs(p)}%</b><small class="dim" style="display:block">${pcs(nu)}% nulos</small></div></div>`;
+  });
+  $('#partChart').innerHTML=h+`<p class="dim" style="font-size:12px;margin-top:10px">2021 fue una elección intermedia: solo se eligieron diputaciones.</p>`;
+}
+
+/* ---------- findings ---------- */
+function findings(){
+  const g=(c,y)=>D.els[c+y].nat, sh=(c,y,i)=>g(c,y).b[i]/g(c,y).total*100;
+  const F=[
+    [sh('pres',2024,0).toFixed(1)+'%','El bloque de Morena creció en presidencia','Pasó de '+sh('pres',2018,0).toFixed(1)+'% en 2018 a '+sh('pres',2024,0).toFixed(1)+'% en 2024. Sus integrantes cambian: PES en 2018, PVEM en 2024.',C1],
+    [(sh('dip',2024,1)).toFixed(1)+'%','PAN, PRI y PRD cayeron como bloque','Sumaban 39.9% en diputaciones 2018 y 39.6% en 2021. En 2024 quedaron en 30.5%. En presidencia bajaron de 34.3% a 27.5%.',C2],
+    [sh('pres',2024,2).toFixed(1)+'%','Movimiento Ciudadano dejó de ser marginal','En diputaciones pasó de 4.3% (2018) a 7.0% (2021) y 10.9% (2024). En presidencia de 1.7% a 10.3%, aunque en 2018 iba aliado con PAN y PRD.',MC],
+    ['9.5%','El PRI cayó en 2024','En diputaciones tuvo 16.6% (2018), 17.8% (2021) y 11.1% (2024). En presidencia pasó de 13.7% a 9.5%. El PVEM sí subió en diputaciones: 4.8%, 5.4% y 8.3%.',C3],
+    ['52.7%','2021, la participación más baja','La elección intermedia fue la de menor participación de las siete. Las presidenciales rondaron 61–64%.','#9aa0a6'],
+    ['86','distritos cambiaron entre 2018 y 2021','De 300 distritos con el mismo mapa, 86 cambiaron de bloque ganador. Mayor alza de Morena: Chiapas 3 (+40.6 pts). Mayor caída: Chiapas 9 (−23.4 pts).','#f2f2f3']
+  ];
+  $('#findings').innerHTML=F.map(f=>`<div class="find"><div class="n num" style="color:${f[3]}">${f[0]}</div><h4>${f[1]}</h4><p>${f[2]}</p></div>`).join('');
+  // flips table
+  const rows=[];
+  [['pres',2018,2024],['dip',2018,2021],['dip',2021,2024],['dip',2018,2024],['sen',2018,2024]].forEach(([c,a,b])=>{
+    const ea=D.els[c+a].states,eb=D.els[c+b].states,ba=BLOCS[c+a],bb=BLOCS[c+b];
+    const f=NAMES.filter(n=>win(ea[n])!==win(eb[n]));
+    rows.push(`<tr><td style="white-space:nowrap"><b style="font-weight:500">${CARGO[c].n}</b><br><span class="dim">${a} → ${b}</span></td><td class="num">${f.length}</td><td>${f.length?f.map(n=>`<span style="white-space:nowrap;margin-right:14px"><i style="background:${ba[win(ea[n])].c}"></i>→<i style="background:${bb[win(eb[n])].c};margin-left:6px"></i>${n}</span>`).join(' '):'<span class="dim">Ninguno</span>'}</td></tr>`);
+  });
+  $('#flips').innerHTML=`<tr><th>Elección</th><th>Estados</th><th>Cuáles (color anterior → color nuevo)</th></tr>`+rows.join('');
+}
+
+/* ---------- render ---------- */
+function render(){left();paintMap();right();timeline()}
+hero();buildMap();render();trajectory();participation();findings();
+})();
+</script>
+</body>
+</html>
